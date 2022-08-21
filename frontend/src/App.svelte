@@ -11,6 +11,10 @@
 
   let selected: string = "Expenses";
 
+  function openNewTab(url: string) {
+    window.open(url, "_blank");
+  }
+
   $: console.log(selected);
 </script>
 
@@ -38,8 +42,7 @@
     {#if selected == "Expenses"}
       <div class="flex justify-items-stretch max-w-lg">
         <button
-          rel="external"
-          href="https://docs.google.com/spreadsheets/d/1988nYIzBAVzhjlSWTuJ___uQb610KfLLpGZh-xvpd2M/edit#gid=0"
+          on:click={() => { openNewTab("https://docs.google.com/spreadsheets/d/1988nYIzBAVzhjlSWTuJ___uQb610KfLLpGZh-xvpd2M/edit#gid=0"); }}
           class={clsx(
             "h-20 m-1 p-2 text-zinc-100 rounded-md bg-gray-600 hover:bg-gray-500 grow"
           )}
