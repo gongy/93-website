@@ -1,6 +1,6 @@
 <script lang="ts">
+  import clsx from "clsx";
+
+  export let selected: boolean = false;
 </script>
 
-<button class="m-2 p-8 text-zinc-100 rounded-md bg-gray-600 hover:bg-gray-500">
-  <slot/>
-</button>
