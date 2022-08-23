@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "clsx": "^1.2.1",
+    "sswr": "^1.7.0",
     "svelte-feather-icons": "^4.0.0"
   }
 }
