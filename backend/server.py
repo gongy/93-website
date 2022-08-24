@@ -1,10 +1,17 @@
+"""
+Backend for 93-website
+deploy using `modal app deploy --name 93 server.py::stub`
+"""
+
 import modal
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 stub = modal.Stub()
 stub.image = modal.image.DebianSlim().pip_install(["pygsheets"])
+volume = modal.SharedVolume().persist("93-db")
 
 web_app = FastAPI()
 
@@ -27,9 +34,36 @@ def get_sheet():
     rows = sheet.get_all_values(include_tailing_empty=False, include_tailing_empty_rows=False)
     return rows
 
-@stub.asgi(secret=modal.ref("my-gsheets-secret"))
+@stub.asgi(
+    secret=modal.ref("my-gsheets-secret"),
+    shared_volumes={"/root/db": modal.SharedVolume()}
+)
 def fastapi():
     return web_app
 
+@stub.function(shared_volumes={"/root/db": volume})
+def update_db():
+    # bump this version after making changes to the database
+    db_version = 1
+
+    with open("/root/db/v", "w+") as f:
+        x = f.read()
+        print(x)
+        if x and int(x) == db_version:
+            return
+
+    import sqlite3
+    con = sqlite3.connect("/root/db/sqlite.db")
+    cur = con.cursor()
+    cur.execute("CREATE TABLE expenses(name, item, screenshot, price)")
+    cur.execute("CREATE TABLE laundry(timestamp, name)")
+
+@stub.function(shared_volumes={"/root/db": volume})
+def read_db():
+    import sqlite3
+    con = sqlite3.connect("/root/db/sqlite.db")
+    cur = con.cursor()
+
 if __name__ == "__main__":
-    stub.deploy("93")
+    with stub.run():
+        init_db()
