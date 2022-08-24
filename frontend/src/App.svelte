@@ -27,7 +27,6 @@
   <div class="grid grid-cols-1 2xs:grid-cols-2 sm:grid-cols-4 pb-3">
     {#each options as option (option)}
       <Button
-        class="p-2"
         selected={selected === option.name}
         on:click={() => {
           selected = option.name;

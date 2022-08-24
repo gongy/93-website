@@ -1,6 +1,4 @@
 <script lang="ts">
-    import clsx from "clsx";
-import { LogInIcon } from "svelte-feather-icons";
     import Button from "./Button.svelte";
 
     const people = ["ak", "dansun", "cjs", "rgong", "jlee", "bwu"];
@@ -29,14 +27,14 @@ import { LogInIcon } from "svelte-feather-icons";
         <div class="py-1 text-zinc-100 text-center">Washer</div>
         <div class="py-1 text-zinc-400 text-center">Status: free</div>
         <div class="py-1 flex justify-center">
-            <Button class="p-1 flex-grow" on:click={() => {console.log("claim");}}>Claim 1 hour</Button>
+            <Button class="flex-grow" on:click={() => {console.log("claim");}}>Claim 1 hour</Button>
         </div>
     </div>
     <div class="m-1 p-2 bg-gray-600 rounded-md">
         <div class="py-1 text-zinc-100 text-center">Dryer</div>
         <div class="py-1 text-zinc-400 text-center">Status: free</div>
         <div class="py-1 flex justify-center">
-            <Button class="p-1 flex-grow" on:click={() => {console.log("claim");}}>Claim 1 hour</Button>
+            <Button class="flex-grow" on:click={() => {console.log("claim");}}>Claim 1 hour</Button>
         </div>
     </div>
 </div>
