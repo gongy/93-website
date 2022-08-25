@@ -1,7 +1,14 @@
 <script lang="ts">
     import Button from "./Button.svelte";
 
-    const people = ["ak", "dansun", "cjs", "rgong", "jlee", "bwu"];
+    const people = [
+        {name: "ak", color: "bg-pink-900 ring-pink-900"},
+        {name: "dansun", color: "bg-purple-900 ring-purple-900"},
+        {name: "cjs", color: "bg-indigo-900 ring-indigo-900"},
+        {name: "rgong", color: "bg-sky-900 ring-sky-900"},
+        {name: "jlee", color: "bg-teal-900 ring-teal-900"},
+        {name: "bwu", color: "bg-green-900 ring-green-900"},
+    ];
 
     let selected: string = "";
     $: console.log(selected);
@@ -14,11 +21,12 @@
     >
         {#each people as person}
             <Button
-                selected={selected === person}
+                selected={selected === person.name}
+                selectedClass={person.color}
                 on:click={() => {
-                    selected = selected === person ? "" : person;
+                    selected = selected === person.name ? "" : person.name;
                 }}
-            >{person}</Button>
+            >{person.name}</Button>
         {/each}
     </div>
 </div>
