@@ -27,7 +27,7 @@
   <div class="grid grid-cols-1 2xs:grid-cols-2 sm:grid-cols-4 pb-3">
     {#each options as option (option)}
       <Button
-        selectedClass="bg-sky-900 ring-sky-900"
+        selectedClass="bg-slate-900 ring-slate-900"
         selected={selected === option.name}
         on:click={() => {
           selected = option.name;
