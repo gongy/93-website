@@ -22,7 +22,7 @@
         {#each people as person}
             <Button
                 selected={selected === person.name}
-                selectedClass={person.color}
+                selectedClass={"bg-gray-700 ring-gray-700"}
                 on:click={() => {
                     selected = selected === person.name ? "" : person.name;
                 }}
