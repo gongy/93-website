@@ -1,5 +1,7 @@
 <script lang="ts">
     import Button from "./Button.svelte";
+    import { useSWR } from "sswr";
+    import { formatDistance } from "date-fns";
 
     const people = [
         {name: "ak", color: "bg-pink-900 ring-pink-900"},
@@ -11,7 +13,51 @@
     ];
 
     let selected: string = "";
+
+    const { data, revalidate } = useSWR("https://gongy-93-fastapi.modal.run/laundry");
+
     $: console.log(selected);
+
+    let washerName = "...";
+    let dryerName = "...";
+    let washerEnd = 0.0;
+    let dryerEnd = 0.0;
+
+    $: if ($data) {
+        const status = $data;
+
+        console.log(status);
+
+        washerEnd = Math.max(...status.map((p: any) => p.washer_end)) * 1000;
+        dryerEnd = Math.max(...status.map((p: any) => p.dryer_end)) * 1000;
+
+        if (washerEnd <= utc_ts()) washerEnd = 0.0;
+        if (dryerEnd <= utc_ts()) dryerEnd = 0.0;
+
+        if (washerEnd) washerName = status.find((p: any) => p.washer_end * 1000 == washerEnd).name;
+        else washerName = "free";
+
+        if (dryerEnd) dryerName = status.find((p: any) => p.dryer_end * 1000 == dryerEnd).name;
+        else dryerName = "free";
+    }
+
+    function utc_ts() {
+        return new Date().getTime();
+    }
+
+    async function sendLaundryUpdate (machine, person, offset) {
+		const res = await fetch('https://gongy-93-fastapi.modal.run/claim', {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({
+                machine,
+                person,
+                offset,
+            })
+        })
+    }
 </script>
 
 <div class="m-1 p-2 bg-gray-600 rounded-md">
@@ -33,16 +79,20 @@
 <div class="grid grid-cols-2">
     <div class="m-1 p-2 bg-gray-600 rounded-md">
         <div class="py-1 text-zinc-100 text-center">Washer</div>
-        <div class="py-1 text-zinc-400 text-center">Status: free</div>
+        <div class="py-1 text-zinc-100 text-center">
+            {washerName} {washerEnd ? `(${formatDistance(washerEnd, utc_ts())} left)` : ""}
+        </div>
         <div class="py-1 flex justify-center">
-            <Button class="flex-grow" on:click={() => {console.log("claim");}}>Claim 1 hour</Button>
+            <Button class="flex-grow" on:click={async () => { await sendLaundryUpdate("washer", selected, 45); revalidate()}}>Claim 45 secs</Button>
         </div>
     </div>
     <div class="m-1 p-2 bg-gray-600 rounded-md">
         <div class="py-1 text-zinc-100 text-center">Dryer</div>
-        <div class="py-1 text-zinc-400 text-center">Status: free</div>
+        <div class="py-1 text-zinc-100 text-center">
+            {dryerName} {dryerEnd ? `(${formatDistance(dryerEnd, utc_ts())} left)` : ""}
+        </div>
         <div class="py-1 flex justify-center">
-            <Button class="flex-grow" on:click={() => {console.log("claim");}}>Claim 1 hour</Button>
+            <Button class="flex-grow" on:click={async () => { await sendLaundryUpdate("dryer", selected, 45); revalidate(); }}>Claim 45 secs</Button>
         </div>
     </div>
 </div>

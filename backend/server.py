@@ -13,6 +13,12 @@ def utc_ts():
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+class LaundryUpdate(BaseModel):
+    machine: str
+    person: str
+    offset: float
 
 stub = modal.Stub()
 stub.image = modal.image.DebianSlim().pip_install(["pygsheets", "pandas"])
@@ -28,8 +34,34 @@ web_app.add_middleware(
     allow_headers=["*"],
 )
 
+@web_app.get("/laundry")
+def query_laundry():
+    import sqlite3
+    con = sqlite3.connect("/root/db/sqlite.db")
+    df = pd.read_sql_query("SELECT * from laundry", con)
+    print(df.to_dict("records"))
+    return df.to_dict("records")
+
+@web_app.post("/claim")
+def claim_laundry(update: LaundryUpdate):
+    print(update)
+
+    if update.machine not in ["washer", "dryer"]:
+        return
+
+    # todo: make this a context manager
+    import sqlite3
+    con = sqlite3.connect("/root/db/sqlite.db")
+    df = pd.read_sql_query("SELECT * from laundry", con)
+    print(df)
+    print(update.machine, update.offset, update.person)
+    df.loc[df['name'] == update.person, update.machine + "_end"] = utc_ts() + update.offset
+    print(df)
+    df.to_sql("laundry", con, if_exists="replace", index=False)
+    con.close()
+    
 @web_app.get("/expenses")
-def get_sheet():
+def query_expenses():
     from fastapi.responses import JSONResponse
     import pygsheets
 
@@ -41,7 +73,7 @@ def get_sheet():
 
 @stub.asgi(
     secret=modal.ref("my-gsheets-secret"),
-    shared_volumes={"/root/db": modal.SharedVolume()}
+    shared_volumes={"/root/db": volume}
 )
 def fastapi():
     return web_app
@@ -85,27 +117,6 @@ def reset_db():
     con.commit()
 
 
-@stub.function(shared_volumes={"/root/db": volume})
-def update_laundry(machine, person):
-    if machine not in ["washer", "dryer"]:
-        return
-
-    # todo: make this a context manager
-    import sqlite3
-    con = sqlite3.connect("/root/db/sqlite.db")
-    df = pd.read_sql_query("SELECT * from laundry", con)
-    df.loc[df['name'] == person, machine + "_end"] = utc_ts()
-    df.to_sql("laundry", con, if_exists="replace")
-    con.close()
-
-@stub.function(shared_volumes={"/root/db": volume})
-def laundry_state():
-    import sqlite3
-    con = sqlite3.connect("/root/db/sqlite.db")
-    cur = con.cursor()
-
-    res = cur.execute("SELECT * FROM laundry")
-    return res.fetchall()
 
 @stub.function(shared_volumes={"/root/db": volume})
 def read_all_db():
@@ -123,7 +134,4 @@ def read_all_db():
 
 if __name__ == "__main__":
     with stub.run():
-        # reset_db()
-        read_all_db()
-        update_laundry(machine="washer", person="rgong")
         read_all_db()
