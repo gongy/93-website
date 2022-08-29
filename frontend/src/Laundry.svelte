@@ -93,7 +93,7 @@
             {washerName} {washerEnd ? `(${formatEnd(washerEnd)} left)` : ""}
         </div>
         <div class="py-1 flex justify-center">
-            <Button class="flex-grow" on:click={async () => { await sendLaundryUpdate("washer", selected, 45); revalidate()}}>Claim 45 secs</Button>
+            <Button class="flex-grow" on:click={async () => { await sendLaundryUpdate("washer", selected, 3600); revalidate()}}>Claim 1 hour</Button>
         </div>
     </div>
     <div class="flex flex-col justify-between m-1 p-2 bg-gray-600 rounded-md">
@@ -102,7 +102,7 @@
             {dryerName} {dryerEnd ? `(${formatEnd(dryerEnd)} left)` : ""}
         </div>
         <div class="py-1 flex justify-center">
-            <Button class="flex-grow" on:click={async () => { await sendLaundryUpdate("dryer", selected, 45); revalidate(); }}>Claim 45 secs</Button>
+            <Button class="flex-grow" on:click={async () => { await sendLaundryUpdate("dryer", selected, 3600); revalidate(); }}>Claim 1 hour</Button>
         </div>
     </div>
 </div>

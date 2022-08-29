@@ -6,18 +6,20 @@
   import {
     BoxIcon,
     CreditCardIcon,
+    LogInIcon,
     SpeakerIcon,
     UserIcon,
   } from "svelte-feather-icons";
 
   const options = [
-    { name: "Expenses", icon: CreditCardIcon },
     { name: "Laundry", icon: SpeakerIcon },
+    { name: "Expenses", icon: CreditCardIcon },
     { name: "Guests", icon: UserIcon },
     { name: "Packages", icon: BoxIcon },
   ];
 
-  let selected: string = "Expenses";
+  let selected: string = "Laundry";
+  let card: any;
 </script>
 
 <main>
@@ -36,6 +38,7 @@
         <div class="flex align-center justify-center">
           <svelte:component
             this={option.icon}
+            bind:this={card}
             class="flex-shrink-0 w-5 h-5 mx-1 mt-0.5"
           />
           <div class="mx-1">{option.name}</div>
