@@ -44,6 +44,16 @@
     function utc_ts() {
         return new Date().getTime();
     }
+    
+    function formatEnd(t) {
+        return formatDistance(
+            t,
+            utc_ts(),
+            {
+                includeSeconds: true
+            }
+        )
+    }
 
     async function sendLaundryUpdate (machine, person, offset) {
 		const res = await fetch('https://gongy-93-fastapi.modal.run/claim', {
@@ -77,19 +87,19 @@
     </div>
 </div>
 <div class="grid grid-cols-2">
-    <div class="m-1 p-2 bg-gray-600 rounded-md">
+    <div class="flex flex-col justify-between m-1 p-2 bg-gray-600 rounded-md">
         <div class="py-1 text-zinc-100 text-center">Washer</div>
         <div class="py-1 text-zinc-100 text-center">
-            {washerName} {washerEnd ? `(${formatDistance(washerEnd, utc_ts())} left)` : ""}
+            {washerName} {washerEnd ? `(${formatEnd(washerEnd)} left)` : ""}
         </div>
         <div class="py-1 flex justify-center">
             <Button class="flex-grow" on:click={async () => { await sendLaundryUpdate("washer", selected, 45); revalidate()}}>Claim 45 secs</Button>
         </div>
     </div>
-    <div class="m-1 p-2 bg-gray-600 rounded-md">
+    <div class="flex flex-col justify-between m-1 p-2 bg-gray-600 rounded-md">
         <div class="py-1 text-zinc-100 text-center">Dryer</div>
         <div class="py-1 text-zinc-100 text-center">
-            {dryerName} {dryerEnd ? `(${formatDistance(dryerEnd, utc_ts())} left)` : ""}
+            {dryerName} {dryerEnd ? `(${formatEnd(dryerEnd)} left)` : ""}
         </div>
         <div class="py-1 flex justify-center">
             <Button class="flex-grow" on:click={async () => { await sendLaundryUpdate("dryer", selected, 45); revalidate(); }}>Claim 45 secs</Button>
