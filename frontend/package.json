@@ -26,6 +26,7 @@
     "@types/date-fns": "^2.6.0",
     "clsx": "^1.2.1",
     "date-fns": "^2.29.2",
+    "jwt-decode": "^3.1.2",
     "sswr": "^1.7.0",
     "svelte-feather-icons": "^4.0.0"
   }
