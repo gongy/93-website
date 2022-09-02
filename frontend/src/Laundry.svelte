@@ -2,7 +2,10 @@
     import Button from "./Button.svelte";
     import { useSWR } from "sswr";
     import { formatDistance } from "date-fns";
-import { Trash2Icon } from "svelte-feather-icons";
+    import { Trash2Icon } from "svelte-feather-icons";
+    import { userToken } from "./stores";
+
+    import jwt_decode from "jwt-decode";
 
     const people = [
         {name: "ak", color: "bg-pink-900 ring-pink-900"},
@@ -12,6 +15,15 @@ import { Trash2Icon } from "svelte-feather-icons";
         {name: "jlee", color: "bg-teal-900 ring-teal-900"},
         {name: "bwu", color: "bg-green-900 ring-green-900"},
     ];
+
+    $: if ($userToken) {
+        const name = (jwt_decode($userToken) as any).given_name.toLowerCase() || ".";
+        if (!selected) {
+            const r = people.map((p) => p.name).filter((n) => n[0] == name[0]);
+            if (r.length > 0) selected = r[0];
+        }
+    }
+
 
     let selected: string = "";
 
