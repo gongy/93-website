@@ -6,12 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>93 Leonard</title>
   </head>
-  <body class="bg-gradient-to-b from-gray-800 via-sky-300 to-gray-800 h-screen bg-gray-800 bg-fixed">
-
-
+  <body class="
+    bg-gradient-to-br
+    from-gray-800
+    via-sky-300
+    to-gray-800
+    h-screen
+    background-animate">
     <div class="m-auto p-6 max-w-xl">
       <div id="app"></div>
       <script type="module" src="/src/main.ts"></script>
     </div>
   </body>
 </html>
+
+<style lang="postcss">
+  .background-animate {
+    background-size: 400% 400%;
+
+    -webkit-animation: AnimationName 12s ease infinite;
+    -moz-animation: AnimationName 12s ease infinite;
+    animation: AnimationName 12s ease infinite;
+  }
+
+  @keyframes AnimationName {
+    0% {
+      @apply bg-sky-300;
+    }
+    100% {
+      @apply bg-gray-600;
+      background-position: 50% 0%;
+    }
+    50% {
+      @apply bg-sky-300;
+      background-position: 50% 100%;
+    }
+  }
+</style>
