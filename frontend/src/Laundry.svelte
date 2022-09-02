@@ -2,6 +2,7 @@
     import Button from "./Button.svelte";
     import { useSWR } from "sswr";
     import { formatDistance } from "date-fns";
+import { Trash2Icon } from "svelte-feather-icons";
 
     const people = [
         {name: "ak", color: "bg-pink-900 ring-pink-900"},
@@ -93,7 +94,10 @@
             {washerName} {washerEnd ? `(${formatEnd(washerEnd)} left)` : ""}
         </div>
         <div class="py-1 flex justify-center">
-            <Button class="flex-grow" on:click={async () => { await sendLaundryUpdate("washer", selected, 3600); revalidate()}}>Claim 1 hour</Button>
+            <Button class="grow" on:click={async () => { await sendLaundryUpdate("washer", selected, 3600); revalidate()}}>Claim 1 hour</Button>
+            <Button class="grow-0 flex items-center justify-center" on:click={async () => { await sendLaundryUpdate("washer", selected, -1000); revalidate(); }}>
+                <Trash2Icon class="w-4 h-4 m-1"/>
+            </Button>
         </div>
     </div>
     <div class="flex flex-col justify-between m-1 p-2 bg-gray-600 rounded-md">
@@ -102,7 +106,10 @@
             {dryerName} {dryerEnd ? `(${formatEnd(dryerEnd)} left)` : ""}
         </div>
         <div class="py-1 flex justify-center">
-            <Button class="flex-grow" on:click={async () => { await sendLaundryUpdate("dryer", selected, 3600); revalidate(); }}>Claim 1 hour</Button>
+            <Button class="grow" on:click={async () => { await sendLaundryUpdate("dryer", selected, 3600); revalidate(); }}>Claim 1 hour</Button>
+            <Button class="grow-0 flex items-center justify-center" on:click={async () => { await sendLaundryUpdate("dryer", selected, -1000); revalidate(); }}>
+                <Trash2Icon class="w-4 h-4 m-1"/>
+            </Button>
         </div>
     </div>
 </div>

@@ -1,39 +1,44 @@
 <script lang="ts">
-  import clsx from "clsx";
+  import clsx from "clsx";;
   import Expenses from "./Expenses.svelte";
   import Laundry from "./Laundry.svelte";
+  import Home from "./Home.svelte";
   import Button from "./Button.svelte";
   import {
-    BoxIcon,
     CreditCardIcon,
-    LogInIcon,
+    HomeIcon,
     SpeakerIcon,
     UserIcon,
   } from "svelte-feather-icons";
+  import { userToken } from "./stores";
+
   import jwt_decode from "jwt-decode";
 
   const options = [
+    { name: "Home", icon: HomeIcon },
     { name: "Laundry", icon: SpeakerIcon },
     { name: "Expenses", icon: CreditCardIcon },
     { name: "Guests", icon: UserIcon },
-    { name: "Packages", icon: BoxIcon },
   ];
 
   let selected: string = "Laundry";
   let card: any;
 
-  let credential: any = undefined;
   let user: any;
+  let hoveringBubble = false;
 
   (window as any).handleCredentialResponse = (response: any) => {
-    user = jwt_decode(response.credential);
+    userToken.set(response.credential as string);
+  }
+
+  $: if ($userToken) {
+    user = jwt_decode($userToken);
     console.log("ID: " + user.sub);
     console.log('Full Name: ' + user.name);
     console.log('Given Name: ' + user.given_name);
     console.log('Family Name: ' + user.family_name);
     console.log("Image URL: " + user.picture);
     console.log("Email: " + user.email);
-    credential = response.credential;
   }
 </script>
 
@@ -42,15 +47,23 @@
 </svelte:head>
 
 <main>
-  <h1 class="flex justify-center pt-10 pb-8">
-    {#if user}
-      <img class="invisible rounded-full w-8 h-8 my-auto" src={user.picture} alt={user.name}/>
-    {/if}
-    <div class="text-center mx-auto text-zinc-100 text-3xl font-light">
+  <h1 class="grid grid-cols-3 pt-10 pb-8">
+    <div class="col-start-2 col-span-1 text-center mx-auto text-zinc-100 text-3xl font-light">
       93 Leonard
     </div>
     {#if user}
-      <img class="rounded-full w-8 h-8 my-auto" src={user.picture} alt={user.name}/>
+    <div class="flex items-center justify-end">
+      <img
+        on:click={() => {
+          console.log("HI");
+          userToken.set("");
+          user = undefined;
+        }}
+        class="rounded-full w-8 h-8 my-auto mx-1 cursor-pointer"
+        src={user.picture}
+        alt={user.name}
+      />
+      </div>
     {/if}
   </h1>
 
@@ -75,8 +88,10 @@
     {/each}
   </div>
 
-  {#if !user}
-    <div class="flex justify-center pt-5">
+    <div class={clsx(
+      "flex justify-center pt-5",
+      user ? "hidden" : "")}
+    >
       <div id="g_id_onload"
         data-client_id="971159492117-cc6jhib74lf8egu0cm67v73jr20k4vvt.apps.googleusercontent.com"
         data-callback="handleCredentialResponse"
@@ -89,15 +104,16 @@
         data-text="signin"
         data-shape="rectangular"
         data-logo_alignment="left">
-        hello
       </div>
     </div>
-  {:else}
+  {#if user}
     <div>
       {#if selected == "Expenses"}
         <Expenses/>
       {:else if selected == "Laundry"}
         <Laundry/>
+      {:else if selected == "Home"}
+        <Home/>
       {/if}
     </div>
   {/if}
