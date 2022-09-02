@@ -21,7 +21,7 @@
     { name: "Guests", icon: UserIcon },
   ];
 
-  let selected: string = "Laundry";
+  let selected: string = options[0].name;
   let card: any;
 
   let user: any;
