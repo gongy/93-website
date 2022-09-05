@@ -63,13 +63,13 @@ def who_is_home():
     x = ""
     if os.path.exists("/root/db/nmap.txt"):
         with open("/root/db/nmap.txt", "r") as f:
-            t = f.readline()
+            t = f.readline()[:-1]
             x = f.read()
     
     print("time", t, "read", x)
 
     addresses = json.loads(os.environ["MAC_ADDRESSES"])
-    res = []
+    res = [t]
     for person, mac in addresses.items():
         if mac in x.lower():
             res.append(person)

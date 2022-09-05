@@ -1,11 +1,11 @@
 <script lang="ts">
     import Button from "./Button.svelte";
     import { useSWR } from "sswr";
-    import { formatDistance } from "date-fns";
     import { Trash2Icon } from "svelte-feather-icons";
     import { userToken } from "./stores";
 
     import jwt_decode from "jwt-decode";
+    import { formatEnd } from "./utils";
 
     const people = [
         {name: "ak", color: "bg-pink-900 ring-pink-900"},
@@ -52,20 +52,6 @@
 
         if (dryerEnd) dryerName = status.find((p: any) => p.dryer_end * 1000 == dryerEnd).name;
         else dryerName = "free";
-    }
-
-    function utc_ts() {
-        return new Date().getTime();
-    }
-    
-    function formatEnd(t) {
-        return formatDistance(
-            t,
-            utc_ts(),
-            {
-                includeSeconds: true
-            }
-        )
     }
 
     async function sendLaundryUpdate (machine, person, offset) {
