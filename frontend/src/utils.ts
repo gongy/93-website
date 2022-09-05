@@ -1,13 +1,13 @@
 import { formatDistance } from "date-fns";
 
-function utc_ts() {
+export function utcTs() {
     return new Date().getTime();
 }
     
 export function formatEnd(t) {
     return formatDistance(
         t,
-        utc_ts(),
+        utcTs(),
         {
             includeSeconds: true
         }

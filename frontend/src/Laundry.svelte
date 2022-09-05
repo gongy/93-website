@@ -5,7 +5,7 @@
     import { userToken } from "./stores";
 
     import jwt_decode from "jwt-decode";
-    import { formatEnd } from "./utils";
+    import { utcTs, formatEnd } from "./utils";
 
     const people = [
         {name: "ak", color: "bg-pink-900 ring-pink-900"},
@@ -44,8 +44,8 @@
         washerEnd = Math.max(...status.map((p: any) => p.washer_end)) * 1000;
         dryerEnd = Math.max(...status.map((p: any) => p.dryer_end)) * 1000;
 
-        if (washerEnd <= utc_ts()) washerEnd = 0.0;
-        if (dryerEnd <= utc_ts()) dryerEnd = 0.0;
+        if (washerEnd <= utcTs()) washerEnd = 0.0;
+        if (dryerEnd <= utcTs()) dryerEnd = 0.0;
 
         if (washerEnd) washerName = status.find((p: any) => p.washer_end * 1000 == washerEnd).name;
         else washerName = "free";
