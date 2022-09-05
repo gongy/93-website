@@ -3,10 +3,12 @@ Backend for 93-website
 deploy using `modal app deploy --name 93 server.py::stub`
 """
 
+from audioop import add
 import modal
 from datetime import datetime, timezone
 import pandas as pd
 import os
+import json
 
 def utc_ts():
     return datetime.now(tz=timezone.utc).timestamp()
@@ -19,6 +21,9 @@ class LaundryUpdate(BaseModel):
     machine: str
     person: str
     offset: float
+
+class HomeUpdate(BaseModel):
+    nmapResult: str
 
 stub = modal.Stub()
 stub.image = modal.image.DebianSlim().pip_install(["pygsheets", "pandas"])
@@ -41,6 +46,35 @@ def query_laundry():
     df = pd.read_sql_query("SELECT * from laundry", con)
     print(df.to_dict("records"))
     return df.to_dict("records")
+
+@web_app.post("/localpost")
+def local_update(update: HomeUpdate):
+    with open("/root/db/nmap.txt", "w+") as f:
+        f.write(str(utc_ts()) + "\n")
+        f.write(update.nmapResult)
+
+    if os.path.exists("/root/db/nmap.txt"):
+        with open("/root/db/nmap.txt", "r") as f:
+            x = f.read()
+            print("confirm write", x)
+
+@web_app.get("/home")
+def who_is_home():
+    x = ""
+    if os.path.exists("/root/db/nmap.txt"):
+        with open("/root/db/nmap.txt", "r") as f:
+            t = f.readline()
+            x = f.read()
+    
+    print("time", t, "read", x)
+
+    addresses = json.loads(os.environ["MAC_ADDRESSES"])
+    res = []
+    for person, mac in addresses.items():
+        if mac in x.lower():
+            res.append(person)
+
+    return res
 
 @web_app.post("/claim")
 def claim_laundry(update: LaundryUpdate):
@@ -72,7 +106,10 @@ def query_expenses():
     return rows
 
 @stub.asgi(
-    secret=modal.ref("my-gsheets-secret"),
+    secrets=[
+        modal.ref("my-gsheets-secret"),
+        modal.ref("local-macs"),
+    ],
     shared_volumes={"/root/db": volume}
 )
 def fastapi():
