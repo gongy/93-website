@@ -47,7 +47,7 @@ def query_laundry():
     print(df.to_dict("records"))
     return df.to_dict("records")
 
-def update_home_df(df, person):
+def modify_home_df(df, person):
     if person in list(df['name']):
         print("person exists")
         df.loc[df['name'] == person, "time"] = utc_ts()
@@ -57,18 +57,20 @@ def update_home_df(df, person):
         df = pd.concat([df, new_df], axis=0, ignore_index=True)
     print(df)
 
+    return df
+
 @web_app.post("/localpost")
 def local_update(update: HomeUpdate):
     import sqlite3
     con = sqlite3.connect("/root/db/sqlite.db")
     df = pd.read_sql_query("SELECT * from home", con)
 
-    update_home_df(df, "updated_at")
+    modify_home_df(df, "updated_at")
 
     addresses = json.loads(os.environ["MAC_ADDRESSES"])
     for person, mac in addresses.items():
         if mac in update.nmapResult.lower():
-            update_home_df(df, person)
+            df = modify_home_df(df, person)
 
     df.to_sql("home", con, if_exists="replace", index=False)
     con.close()
@@ -82,7 +84,7 @@ def who_is_home():
     df = pd.read_sql_query("SELECT * from home", con)
 
     res = []
-    for row in df.iterrows():
+    for _, row in df.iterrows():
         res.append({'name': row['name'], 'time': row['time']})
 
     return res
