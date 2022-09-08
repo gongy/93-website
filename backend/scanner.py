@@ -15,4 +15,4 @@ while True:
     print(res.reason)
     print(res.status_code)
 
-    time.sleep(3)
+    time.sleep(3 * 60)
