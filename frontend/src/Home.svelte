@@ -24,7 +24,9 @@
             <div class="shrink-0 w-2 h-2 bg-red-600 rounded-lg mr-4 ml-2"/>
           {/if}
           {person.name}
-          ({minsAgo(person.time)}m)
+          {#if minsAgo(person.time) >= 5}
+            ({minsAgo(person.time)}m)
+          {/if}
         </div>
       {/each}
   </div>
