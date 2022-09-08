@@ -13,11 +13,12 @@
       {#each $people.splice(1) as person}
         <div class="flex items-center bg-gray-600 text-zinc-100 p-2 rounded-md my-1 mx-1">
           <div class="w-2 h-2 bg-green-600 rounded-lg mr-4 ml-2"/>
-          {person}
+          {person.name}
+          {person.time}
         </div>
       {/each}
   </div>
   <div class="m-1 mt-4 text-zinc-100 text-center">
-    Updated {formatEnd($people[0] * 1000)} ago.
+    Updated {formatEnd($people[0].time * 1000)} ago.
   </div>
 {/if}

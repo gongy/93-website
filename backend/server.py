@@ -47,32 +47,43 @@ def query_laundry():
     print(df.to_dict("records"))
     return df.to_dict("records")
 
+def update_home_df(df, person):
+    if person in list(df['name']):
+        print("person exists")
+        df.loc[df['name'] == person, "time"] = utc_ts()
+    else:
+        print("person doesn't exist")
+        new_df = pd.DataFrame([{"name": person, "time": utc_ts()}])
+        df = pd.concat([df, new_df], axis=0, ignore_index=True)
+    print(df)
+
 @web_app.post("/localpost")
 def local_update(update: HomeUpdate):
-    with open("/root/db/nmap.txt", "w+") as f:
-        f.write(str(utc_ts()) + "\n")
-        f.write(update.nmapResult)
+    import sqlite3
+    con = sqlite3.connect("/root/db/sqlite.db")
+    df = pd.read_sql_query("SELECT * from home", con)
 
-    if os.path.exists("/root/db/nmap.txt"):
-        with open("/root/db/nmap.txt", "r") as f:
-            x = f.read()
-            print("confirm write", x)
+    update_home_df(df, "updated_at")
+
+    addresses = json.loads(os.environ["MAC_ADDRESSES"])
+    for person, mac in addresses.items():
+        if mac in update.nmapResult.lower():
+            update_home_df(df, person)
+
+    df.to_sql("home", con, if_exists="replace", index=False)
+    con.close()
+
+    read_all_db()
 
 @web_app.get("/home")
 def who_is_home():
-    x = ""
-    if os.path.exists("/root/db/nmap.txt"):
-        with open("/root/db/nmap.txt", "r") as f:
-            t = f.readline()[:-1]
-            x = f.read()
-    
-    print("time", t, "read", x)
+    import sqlite3
+    con = sqlite3.connect("/root/db/sqlite.db")
+    df = pd.read_sql_query("SELECT * from home", con)
 
-    addresses = json.loads(os.environ["MAC_ADDRESSES"])
-    res = [t]
-    for person, mac in addresses.items():
-        if mac in x.lower():
-            res.append(person)
+    res = []
+    for row in df.iterrows():
+        res.append({'name': row['name'], 'time': row['time']})
 
     return res
 
@@ -120,29 +131,20 @@ def fastapi():
     shared_volumes={"/root/db": volume}
 )
 def reset_db():
-    # bump this version after making changes to the database
-    db_version = 1
-
-    with open("/root/db/v", "w+") as f:
-        x = f.read()
-        print(x)
-        if x and int(x) == db_version:
-            return
-
-    import pygsheets
-    doc = "1988nYIzBAVzhjlSWTuJ___uQb610KfLLpGZh-xvpd2M"
-    gc = pygsheets.authorize(service_account_env_var="SERVICE_ACCOUNT_JSON")
-    sheet = gc.open_by_key(doc).sheet1
-    rows = sheet.get_all_values(include_tailing_empty=False, include_tailing_empty_rows=False)
-
     import sqlite3
     con = sqlite3.connect("/root/db/sqlite.db")
     cur = con.cursor()
 
-    cur.execute("DROP TABLE IF EXISTS expenses")
-    cur.execute("CREATE TABLE expenses(name, item, screenshot, price)")
-    cur.executemany("INSERT INTO expenses VALUES(?, ?, ?, ?)", rows)
-    con.commit()
+    # import pygsheets
+    # doc = "1988nYIzBAVzhjlSWTuJ___uQb610KfLLpGZh-xvpd2M"
+    # gc = pygsheets.authorize(service_account_env_var="SERVICE_ACCOUNT_JSON")
+    # sheet = gc.open_by_key(doc).sheet1
+    # rows = sheet.get_all_values(include_tailing_empty=False, include_tailing_empty_rows=False)
+
+    # cur.execute("DROP TABLE IF EXISTS expenses")
+    # cur.execute("CREATE TABLE expenses(name, item, screenshot, price)")
+    # cur.executemany("INSERT INTO expenses VALUES(?, ?, ?, ?)", rows)
+    # con.commit()
 
     cur.execute("DROP TABLE IF EXISTS laundry")
     cur.execute("CREATE TABLE laundry(name, washer_end, dryer_end)")
@@ -153,6 +155,10 @@ def reset_db():
     cur.executemany("INSERT INTO laundry VALUES(?, ?, ?)", people)
     con.commit()
 
+    cur.execute("DROP TABLE IF EXISTS home")
+    cur.execute("CREATE TABLE home(name, time)")
+    cur.execute("INSERT INTO home VALUES(?, ?)", ["updated_at", 0])
+    con.commit()
 
 
 @stub.function(shared_volumes={"/root/db": volume})
@@ -169,6 +175,11 @@ def read_all_db():
     res = cur.execute("SELECT * FROM laundry")
     print(res.fetchall())
 
+    print("home table")
+    res = cur.execute("SELECT * FROM home")
+    print(res.fetchall())
+
 if __name__ == "__main__":
     with stub.run():
+        reset_db()
         read_all_db()
