@@ -24,7 +24,9 @@
           {/if}
           {person.name}
           {#if minsAgo(person.time) >= 5}
-            ({minsAgo(person.time)}m)
+            <span class="ml-auto text-zinc-400">
+              {minsAgo(person.time)}m
+            </span>
           {/if}
         </div>
       {/each}

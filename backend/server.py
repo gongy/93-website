@@ -89,7 +89,9 @@ def who_is_home():
     
     s = sorted(res[1:], key=lambda x:-x['time'])
 
-    return res[0] + s
+    print(s)
+
+    return [res[0]] + s
 
 @web_app.post("/claim")
 def claim_laundry(update: LaundryUpdate):
