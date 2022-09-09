@@ -14,13 +14,13 @@
 {#if $people}
   <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3">
       {#each $people.slice(1) as person}
-        <div class="flex items-center bg-gray-600 text-zinc-100 p-1 rounded-md my-1 mx-1">
+        <div class="flex items-center bg-gray-600 text-zinc-100 p-1 px-3 rounded-md my-1 mx-1">
           {#if minsAgo(person.time) < 5}
-            <div class="shrink-0 w-2 h-2 bg-green-600 rounded-lg mr-3 ml-2"/>
+            <div class="shrink-0 w-2 h-2 bg-green-600 rounded-lg mr-3"/>
           {:else if minsAgo(person.time) < 15}
-            <div class="shrink-0 w-2 h-2 bg-orange-600 rounded-lg mr-3 ml-2"/>
+            <div class="shrink-0 w-2 h-2 bg-orange-600 rounded-lg mr-3"/>
           {:else}
-            <div class="shrink-0 w-2 h-2 bg-red-600 rounded-lg mr-3 ml-2"/>
+            <div class="shrink-0 w-2 h-2 bg-red-600 rounded-lg mr-3"/>
           {/if}
           {person.name}
           {#if minsAgo(person.time) >= 5}
