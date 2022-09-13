@@ -65,12 +65,12 @@ def local_update(update: HomeUpdate):
     con = sqlite3.connect("/root/db/sqlite.db")
     df = pd.read_sql_query("SELECT * from home", con)
 
-    modify_home_df(df, "updated_at")
-
     addresses = json.loads(os.environ["MAC_ADDRESSES"])
     for person, mac in addresses.items():
         if mac in update.nmapResult.lower():
             df = modify_home_df(df, person)
+
+    df = modify_home_df(df, "updated_at")
 
     df.to_sql("home", con, if_exists="replace", index=False)
     con.close()
@@ -87,11 +87,9 @@ def who_is_home():
     for _, row in df.iterrows():
         res.append({'name': row['name'], 'time': row['time']})
     
-    s = sorted(res[1:], key=lambda x:-x['time'])
+    s = sorted(res, key=lambda x:-x['time'])
 
-    print(s)
-
-    return [res[0]] + s
+    return s
 
 @web_app.post("/claim")
 def claim_laundry(update: LaundryUpdate):
