@@ -122,8 +122,8 @@ def query_expenses():
 
 @stub.asgi(
     secrets=[
-        modal.ref("my-gsheets-secret"),
-        modal.ref("local-macs"),
+        modal.Secret.from_name("my-gsheets-secret"),
+        modal.Secret.from_name("local-macs"),
     ],
     shared_volumes={"/root/db": volume}
 )
@@ -131,7 +131,7 @@ def fastapi():
     return web_app
 
 @stub.function(
-    secret=modal.ref("my-gsheets-secret"),
+    secret=modal.Secret.from_name("my-gsheets-secret"),
     shared_volumes={"/root/db": volume}
 )
 def reset_db():

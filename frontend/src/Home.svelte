@@ -25,7 +25,7 @@
             <div class="shrink-0 w-2 h-2 bg-green-600 rounded-lg mr-3"/>
           {:else if minsAgo(person.time) < 15}
             <div class="shrink-0 w-2 h-2 bg-orange-600 rounded-lg mr-3"/>
-          {:else}
+          {:else if minsAgo(person.time) < 60 * 24 * 7}
             <div class="shrink-0 w-2 h-2 bg-red-600 rounded-lg mr-3"/>
           {/if}
           {person.name}
