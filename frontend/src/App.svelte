@@ -3,12 +3,13 @@
   import Expenses from "./Expenses.svelte";
   import Laundry from "./Laundry.svelte";
   import Home from "./Home.svelte";
+  import Games from "./Games.svelte";
   import Button from "./Button.svelte";
   import {
     CreditCardIcon,
     HomeIcon,
     SpeakerIcon,
-    UserIcon,
+    ZapIcon,
   } from "svelte-feather-icons";
   import { userToken } from "./stores";
 
@@ -18,7 +19,7 @@
     { name: "Home", icon: HomeIcon },
     { name: "Laundry", icon: SpeakerIcon },
     { name: "Expenses", icon: CreditCardIcon },
-    { name: "Guests", icon: UserIcon },
+    { name: "Games", icon: ZapIcon },
   ];
 
   let selected: string = options[0].name;
@@ -114,6 +115,8 @@
         <Laundry/>
       {:else if selected == "Home"}
         <Home/>
+      {:else if selected == "Games"}
+        <Games/>
       {/if}
     </div>
   {/if}
